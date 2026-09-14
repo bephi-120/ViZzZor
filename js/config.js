@@ -23,10 +23,10 @@ const VIZZZOR_CONFIG = {
   // que haber una subcarpeta por cada tomo (cada una con sus paginas).
   // Es el pedazo de la URL despues de "folders/" cuando abris la carpeta
   // en drive.google.com.
-  driveFolderId: "PEGA_AQUI_EL_ID_DE_TU_CARPETA_DE_DRIVE",
+  driveFolderId: "1tBZ9mOHVr2MCuMX6fU3J5jxS9HFI-D7r",
 
   // API key de Google Cloud (proyecto "Drive Gallery"), con la Google
   // Drive API habilitada. No es lo mismo que el Client ID de OAuth que
   // ya creaste - esta es mas simple, es solo una clave.
-  driveApiKey: "PEGA_AQUI_TU_API_KEY",
+  driveApiKey: "AIzaSyC4m_HMCW0JmZUPM7tDo4ZT1cRhtsR8KLs",
 };
