@@ -12,7 +12,6 @@
 const VIZZZOR_CONFIG = {
   siteTitle: "ViZzZor",
   tagline: "Cómics propios, para quien tenga la clave.",
-  // Contraseña actual: Fuchi123
   passwordHash:
     "c9188699e8afc1996bbcb1328b40eb593b6aee9dd1436bfc2af3c2110ef41729",
 };
