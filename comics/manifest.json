@@ -1,0 +1,29 @@
+{
+  "generated": "2026-09-14T05:01:33.550712+00:00",
+  "volumes": [
+    {
+      "id": "tomo-de-ejemplo-1",
+      "title": "Tomo de ejemplo 1",
+      "pageCount": 6,
+      "pages": [
+        "comics/Tomo de ejemplo 1/001.jpg",
+        "comics/Tomo de ejemplo 1/002.jpg",
+        "comics/Tomo de ejemplo 1/003.jpg",
+        "comics/Tomo de ejemplo 1/004.jpg",
+        "comics/Tomo de ejemplo 1/005.jpg",
+        "comics/Tomo de ejemplo 1/006.jpg"
+      ]
+    },
+    {
+      "id": "tomo-de-ejemplo-2",
+      "title": "Tomo de ejemplo 2",
+      "pageCount": 4,
+      "pages": [
+        "comics/Tomo de ejemplo 2/001.jpg",
+        "comics/Tomo de ejemplo 2/002.jpg",
+        "comics/Tomo de ejemplo 2/003.jpg",
+        "comics/Tomo de ejemplo 2/004.jpg"
+      ]
+    }
+  ]
+}

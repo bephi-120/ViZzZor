@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ViZzZor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%230d0f12%22/><text x=%2250%22 y=%2270%22 font-size=%2270%22 font-family=%22Arial Black%22 fill=%22%23d63347%22 text-anchor=%22middle%22>V</text></svg>" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="halftone-bg"></div>
+
+<!-- ===== Pantalla de acceso ===== -->
+<section id="gate-screen">
+  <div class="gate-panel">
+    <h1 class="wordmark">Vi<span>Zzz</span>or</h1>
+    <p class="gate-tagline" id="gate-tagline"></p>
+    <form class="gate-form" id="gate-form" autocomplete="off">
+      <label for="gate-password">Contraseña</label>
+      <input type="password" id="gate-password" name="password" placeholder="••••••••" autofocus />
+      <button type="submit" class="gate-submit">Entrar</button>
+      <p class="gate-error" id="gate-error"></p>
+    </form>
+  </div>
+</section>
+
+<!-- ===== Biblioteca de tomos ===== -->
+<section id="library-screen" class="hidden">
+  <header class="library-header">
+    <h1 class="wordmark">Vi<span>Zzz</span>or</h1>
+    <button class="logout-btn" id="logout-btn">Salir</button>
+  </header>
+  <div class="library-grid" id="library-grid"></div>
+</section>
+
+<!-- ===== Visor de páginas ===== -->
+<section id="viewer-screen" class="hidden">
+  <div class="viewer-bar bar-top" id="viewer-bar-top">
+    <button class="viewer-btn" id="back-btn" title="Volver a la biblioteca">‹</button>
+    <div class="viewer-title-group">
+      <span class="viewer-title" id="viewer-title">—</span>
+      <span class="viewer-page-count" id="viewer-page-count">—</span>
+    </div>
+    <div class="viewer-modes">
+      <button class="viewer-btn" id="mode-height-btn" title="Ajustar a la altura (página completa)">▤</button>
+      <button class="viewer-btn" id="mode-width-btn" title="Ajustar al ancho (más zoom)">▥</button>
+      <button class="viewer-btn" id="mode-original-btn" title="Tamaño original">1:1</button>
+      <button class="viewer-btn" id="fullscreen-btn" title="Pantalla completa">⛶</button>
+    </div>
+  </div>
+
+  <div class="viewer-stage mode-height" id="viewer-stage">
+    <div class="click-zone left" id="zone-prev"></div>
+    <div class="click-zone right" id="zone-next"></div>
+    <span class="viewer-loading" id="viewer-loading">Cargando…</span>
+    <img id="viewer-image" alt="Página del cómic" draggable="false" />
+  </div>
+
+  <div class="viewer-bar bar-bottom" id="viewer-bar-bottom">
+    <button class="viewer-btn" id="prev-btn" title="Página anterior">‹</button>
+    <input type="range" class="viewer-slider" id="page-slider" min="0" max="0" value="0" />
+    <button class="viewer-btn" id="next-btn" title="Página siguiente">›</button>
+  </div>
+</section>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
