@@ -9,7 +9,7 @@ Funciona como página estática en GitHub Pages, sin backend ni base de datos.
 
 ## Qué incluye
 
-- **Contraseña de entrada** (`Fuchi123` por defecto, se cambia fácil).
+- **Contraseña de entrada** (`` por defecto, se cambia fácil).
 - **Biblioteca** con los tomos que subiste, cada uno con su portada.
 - **Visor tipo YACReader**: una página a la vez (nada de scroll infinito),
   navegación con flechas del teclado, clic a los costados de la imagen,
