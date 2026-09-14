@@ -39,6 +39,7 @@
   };
 
   let manifest = { volumes: [] };
+  let libraryError = null;
   let currentVolume = null;
   let currentPage = 0;
   let viewMode = localStorage.getItem(VIEWMODE_KEY) || "height";
@@ -71,7 +72,7 @@
     if (ok) {
       sessionStorage.setItem(SESSION_KEY, "1");
       gateError.textContent = "";
-      enterLibrary();
+      await enterLibrary();
     } else {
       gateError.textContent = "Contraseña incorrecta. Probá de nuevo.";
       gatePanel.classList.remove("shake");
@@ -91,25 +92,116 @@
     gatePassword.focus();
   });
 
-  // ---------- biblioteca ----------
-  async function loadManifest() {
+  // ---------- biblioteca (Google Drive) ----------
+
+  // Compara nombres de archivo "naturalmente": "2.jpg" antes que "10.jpg".
+  function naturalCompare(a, b) {
+    const chunk = (s) => s.match(/(\d+|\D+)/g) || [];
+    const ax = chunk(a);
+    const bx = chunk(b);
+    const len = Math.max(ax.length, bx.length);
+    for (let i = 0; i < len; i++) {
+      const x = ax[i] || "";
+      const y = bx[i] || "";
+      const xNum = /^\d+$/.test(x);
+      const yNum = /^\d+$/.test(y);
+      if (xNum && yNum) {
+        const diff = parseInt(x, 10) - parseInt(y, 10);
+        if (diff !== 0) return diff;
+      } else {
+        const cmp = x.localeCompare(y);
+        if (cmp !== 0) return cmp;
+      }
+    }
+    return 0;
+  }
+
+  function driveImageUrl(fileId) {
+    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${VIZZZOR_CONFIG.driveApiKey}`;
+  }
+
+  // Pide a la Google Drive API todos los archivos que matchean "query",
+  // paginando si hace falta.
+  async function driveList(query, fields) {
+    let files = [];
+    let pageToken = "";
+    do {
+      const params = new URLSearchParams({
+        q: query,
+        key: VIZZZOR_CONFIG.driveApiKey,
+        fields: `nextPageToken, files(${fields})`,
+        pageSize: "1000",
+        orderBy: "name",
+      });
+      if (pageToken) params.set("pageToken", pageToken);
+      const res = await fetch(`https://www.googleapis.com/drive/v3/files?${params.toString()}`);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error?.message || `Google Drive respondió ${res.status}`);
+      }
+      const data = await res.json();
+      files = files.concat(data.files || []);
+      pageToken = data.nextPageToken || "";
+    } while (pageToken);
+    return files;
+  }
+
+  async function loadLibraryFromDrive() {
+    const { driveFolderId, driveApiKey } = VIZZZOR_CONFIG;
+    if (!driveFolderId || !driveApiKey || driveFolderId.startsWith("PEGA_") || driveApiKey.startsWith("PEGA_")) {
+      manifest = { volumes: [] };
+      libraryError =
+        "Todavía no conectaste Google Drive: completá driveFolderId y driveApiKey en js/config.js (ver README).";
+      return;
+    }
     try {
-      const res = await fetch("comics/manifest.json", { cache: "no-store" });
-      if (!res.ok) throw new Error("No se encontró comics/manifest.json");
-      manifest = await res.json();
+      const folders = await driveList(
+        `'${driveFolderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+        "id,name"
+      );
+      folders.sort((a, b) => naturalCompare(a.name, b.name));
+
+      const volumes = [];
+      for (const folder of folders) {
+        const images = await driveList(
+          `'${folder.id}' in parents and mimeType contains 'image/' and trashed=false`,
+          "id,name,mimeType"
+        );
+        if (images.length === 0) continue;
+        images.sort((a, b) => naturalCompare(a.name, b.name));
+        volumes.push({
+          id: folder.id,
+          title: folder.name,
+          pageCount: images.length,
+          pages: images.map((img) => driveImageUrl(img.id)),
+        });
+      }
+      manifest = { volumes };
+      libraryError = null;
     } catch (err) {
       console.error(err);
       manifest = { volumes: [] };
+      libraryError =
+        "No se pudo traer los tomos desde Google Drive. Revisá que la carpeta esté compartida como " +
+        "\u201cCualquiera con el enlace\u201d y que la API key en config.js sea correcta. " +
+        "Detalle: " + err.message;
     }
   }
 
   function renderLibrary() {
     libraryGrid.innerHTML = "";
+    if (libraryError) {
+      const err = document.createElement("p");
+      err.className = "library-empty";
+      err.textContent = libraryError;
+      libraryGrid.appendChild(err);
+      return;
+    }
     if (!manifest.volumes || manifest.volumes.length === 0) {
       const empty = document.createElement("p");
       empty.className = "library-empty";
       empty.textContent =
-        "Todavía no hay tomos publicados. Subí una carpeta con imágenes dentro de /comics y hacé push.";
+        "Todavía no hay tomos en tu carpeta de Drive. Creá una subcarpeta por tomo, subí las páginas, y compartila como \u201cCualquiera con el enlace\u201d.";
       libraryGrid.appendChild(empty);
       return;
     }
@@ -128,10 +220,13 @@
     });
   }
 
-  function enterLibrary() {
+  async function enterLibrary() {
     hide(gateScreen);
     hide(viewerScreen);
     show(libraryScreen);
+    libraryGrid.innerHTML = '<p class="library-empty">Cargando tus tomos desde Google Drive…</p>';
+    await loadLibraryFromDrive();
+    renderLibrary();
   }
 
   // ---------- visor ----------
@@ -264,13 +359,11 @@
 
   // ---------- arranque ----------
   async function init() {
-    await loadManifest();
     if (sessionStorage.getItem(SESSION_KEY) === "1") {
-      renderLibrary();
-      enterLibrary();
-    } else {
-      renderLibrary();
+      await enterLibrary();
     }
+    // si no está desbloqueado, no pedimos nada a Drive todavía: se queda
+    // mostrando la pantalla de contraseña (estado por defecto del HTML).
   }
 
   init();
